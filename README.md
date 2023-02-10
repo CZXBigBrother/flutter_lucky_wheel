@@ -1,6 +1,6 @@
-![1.gif](https://github.com/CZXBigBrother/flutter_lucky_wheel/1.gif)
+![1.gif](https://github.com/CZXBigBrother/flutter_lucky_wheel/blob/master/1.gif)
 功能实现起来其实非常简单,将下面三张图依次叠加起来,然后让指针转动或者奖励转动就可以了
-![image.png](https://github.com/CZXBigBrother/flutter_lucky_wheel/3.png)
+![image.png](https://github.com/CZXBigBrother/flutter_lucky_wheel/blob/master/3.png)
 先上代码
 ```
   @override
