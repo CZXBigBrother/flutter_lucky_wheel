@@ -1,8 +1,26 @@
-![1.gif](https://github.com/CZXBigBrother/flutter_lucky_wheel/1.gif)
-功能实现起来其实非常简单,将下面三张图依次叠加起来,然后让指针转动或者奖励转动就可以了
-![image.png](https://github.com/CZXBigBrother/flutter_lucky_wheel/3.png)
-先上代码
-```
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+class LuckyWheelController extends StatefulWidget {
+  @override
+  _LuckyWheelControllerState createState() => _LuckyWheelControllerState();
+}
+
+class _LuckyWheelControllerState extends State<LuckyWheelController>
+    with TickerProviderStateMixin {
+  late AnimationController animationController;
+  late Animation<double> _animation;
+  late Animation<double> _curveAnimation;
+
+  //是否正在转动
+  bool isRunning = false;
+  //是否顺时针
+  bool isClockwise = true;
+  //奖品数量
+  int prizeNum = 8;
+  //最少转动圈数
+  int cyclesNum = 2;
+
   @override
   void initState() {
     super.initState();
@@ -10,6 +28,7 @@
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     );
+    //动画监听
     animationController.addListener(() {
       if (animationController.status == AnimationStatus.completed) {
         isRunning = false;
@@ -20,11 +39,40 @@
         // print('reverse');
       }
     });
+    //初始位置
+    _animation = Tween<double>(begin: 0, end: 0).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: const Interval(
+          0,
+          1.0,
+          curve: Curves.easeInToLinear,
+        ),
+      ),
+    );
+
     // 创建一个从0到360弧度的补间动画 v * 2 * π
   }
 
+  void start() {
+    ///中奖编号
+    int luckyName = Random().nextInt(8);
+    startAnimation(luckyName);
+  }
+
+  void buttonOnClickStartRun() {
+    if (isRunning == false) {
+      isRunning = true;
+    } else {
+      return;
+    }
+    start();
+  }
+
   void startAnimation(int index) {
-    _animation = Tween<double>(begin: 0, end: 2 + 0.125 * index)
+    _animation = Tween<double>(
+            begin: 0,
+            end: (isClockwise ? 1 : -1) * (cyclesNum + (1 / prizeNum)) * index)
         .animate(CurvedAnimation(
       parent: animationController,
       curve: const Interval(
@@ -37,10 +85,19 @@
     animationController.reset();
     animationController.forward();
   }
-```
-我们提供的素材是有8个奖品.所以我们最终的落点是 ```0.125 * index```,但是我们之前要想多转两圈再停止所以前面先加```2```,可以根据设计给的图片改变其实旋转的圈数和最终落点的角度,修改角度的正负号就可以实现向左转动还是向右转动
-```
-Widget wheelView() {
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return wheelView();
+  }
+
+  Widget wheelView() {
     return SizedBox(
       width: 300,
       height: 300,
@@ -76,7 +133,4 @@ Widget wheelView() {
       ),
     );
   }
-```
-最后是控件本身非常简单,如果想转盘转,就把bg_superjiangpin设置动画,如果想指针转就用ic_pointer设置动画
-
-
+}
